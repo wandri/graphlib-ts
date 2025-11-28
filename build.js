@@ -12,16 +12,14 @@ const sharedConfig = {
   sourcemap: true,
   target: 'es2018',
   legalComments: 'linked',
-  external: external.concat([
-    '@dagrejs/graphlib'
-  ]),
+  external: external.concat([]),
 };
 
 async function build() {
   // 1. CommonJS (CJS) - For Node.js `require()`
   await esbuild.build({
     ...sharedConfig,
-    outfile: 'dist/dagre.cjs.js',
+    outfile: 'dist/graphlib.cjs.js',
     format: 'cjs',
     platform: 'node',
   });
@@ -29,7 +27,7 @@ async function build() {
   // 2. ES Module (ESM) - For modern bundlers/native ES imports
   await esbuild.build({
     ...sharedConfig,
-    outfile: 'dist/dagre.esm.js',
+    outfile: 'dist/graphlib.esm.js',
     format: 'esm',
     platform: 'neutral',
   });
@@ -37,24 +35,24 @@ async function build() {
   const iifeConfig = {
     ...sharedConfig,
     format: 'iife',
-    globalName: 'dagre',
+    globalName: 'graphlib',
     platform: 'browser',
   };
 
   // 3. IIFE/UMD - For direct browser script tag
   await esbuild.build({
     ...iifeConfig,
-    outfile: 'dist/dagre.min.js',
+    outfile: 'dist/graphlib.min.js',
   });
 
   // 4. IIFE/UMD - For direct browser script tag, unminified
   await esbuild.build({
     ...iifeConfig,
-    outfile: 'dist/dagre.js',
+    outfile: 'dist/graphlib.js',
     minify: false,
   });
 
-  fs.copyFileSync('index.d.ts', 'dist/dagre.d.ts');
+  fs.copyFileSync('index.d.ts', 'dist/graphlib.d.ts');
   
   console.log('Build complete! 🚀');
 }
