@@ -1,4 +1,4 @@
-var dagre = (() => {
+var graphlib = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -1238,4 +1238,4 @@ var dagre = (() => {
   });
   return require_index();
 })();
-//# sourceMappingURL=dagre.js.map
+//# sourceMappingURL=graphlib.js.map
