@@ -521,14 +521,10 @@ var graphlib = (() => {
          * Complexity: O(|E|).
          */
         inEdges(v, u) {
-          var inV = this._in[v];
-          if (inV) {
-            var edges = Object.values(inV);
-            if (!u) {
-              return edges;
-            }
-            return edges.filter((edge) => edge.v === u);
+          if (this.isDirected()) {
+            return this.filterEdges(this._in[v], v, u);
           }
+          return this.nodeEdges(v, u);
         }
         /**
          * Return all edges that are pointed at by node v. Optionally filters those edges down to just
@@ -536,14 +532,10 @@ var graphlib = (() => {
          * Complexity: O(|E|).
          */
         outEdges(v, w) {
-          var outV = this._out[v];
-          if (outV) {
-            var edges = Object.values(outV);
-            if (!w) {
-              return edges;
-            }
-            return edges.filter((edge) => edge.w === w);
+          if (this.isDirected()) {
+            return this.filterEdges(this._out[v], v, w);
           }
+          return this.nodeEdges(v, w);
         }
         /**
          * Returns all edges to or from node v regardless of direction. Optionally filters those edges
@@ -551,10 +543,21 @@ var graphlib = (() => {
          * Complexity: O(|E|).
          */
         nodeEdges(v, w) {
-          var inEdges = this.inEdges(v, w);
-          if (inEdges) {
-            return inEdges.concat(this.outEdges(v, w));
+          if (v in this._nodes) {
+            return this.filterEdges({ ...this._in[v], ...this._out[v] }, v, w);
           }
+        }
+        filterEdges(setV, localEdge, remoteEdge) {
+          if (!setV) {
+            return;
+          }
+          var edges = Object.values(setV);
+          if (!remoteEdge) {
+            return edges;
+          }
+          return edges.filter(function(edge) {
+            return edge.v === localEdge && edge.w === remoteEdge || edge.v === remoteEdge && edge.w === localEdge;
+          });
         }
       };
       function incrementOrInitEntry(map, k) {
@@ -857,13 +860,14 @@ var graphlib = (() => {
       module.exports = dijkstra;
       var DEFAULT_WEIGHT_FUNC = () => 1;
       function dijkstra(g, source, weightFn, edgeFn) {
+        var defaultEdgeFn = function(v) {
+          return g.outEdges(v);
+        };
         return runDijkstra(
           g,
           String(source),
           weightFn || DEFAULT_WEIGHT_FUNC,
-          edgeFn || function(v) {
-            return g.outEdges(v);
-          }
+          edgeFn || defaultEdgeFn
         );
       }
       function runDijkstra(g, source, weightFn, edgeFn) {
