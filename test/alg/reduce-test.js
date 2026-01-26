@@ -1,6 +1,5 @@
-var expect = require("../chai").expect,
-    Graph = require("../..").Graph,
-    reduce = require("../..").alg.reduce;
+var Graph = require("../..").Graph,
+  reduce = require("../..").alg.reduce;
 
 describe("alg.reduce", function() {
   it("returns the initial accumulator value when the graph is empty",
@@ -9,7 +8,7 @@ describe("alg.reduce", function() {
 
       expect(reduce(g, [], "pre", function(a, b) {
         return a + "wrong" + b;
-      }, 0)).to.eql(0);
+      }, 0)).toEqual(0);
     }
   );
 
@@ -20,7 +19,7 @@ describe("alg.reduce", function() {
 
     expect(reduce(g, "2", "pre", function(a, b) {
       return Number(a) + Number(b);
-    }, 0)).to.eql(42);
+    }, 0)).toEqual(42);
   });
 
   it("traverses the graph in pre order", function() {
@@ -30,7 +29,7 @@ describe("alg.reduce", function() {
 
     expect(reduce(g, "2", "pre", function(a, b) {
       return a + b + "-";
-    }, "")).to.eql("2-1-3-5-11-13-7-");
+    }, "")).toEqual("2-1-3-5-11-13-7-");
   });
 
   it("traverses the graph in post order", function() {
@@ -40,6 +39,6 @@ describe("alg.reduce", function() {
 
     expect(reduce(g, "2", "post", function(a, b) {
       return a + b + "-";
-    }, "")).to.eql("1-13-11-7-5-3-2-");
+    }, "")).toEqual("1-13-11-7-5-3-2-");
   });
 });
