@@ -916,6 +916,35 @@ var graphlib = (() => {
     }
   });
 
+  // lib/alg/extract-path.js
+  var require_extract_path = __commonJS({
+    "lib/alg/extract-path.js"(exports, module) {
+      module.exports = extractPath;
+      function extractPath(shortestPaths, source, destination) {
+        if (shortestPaths[source].predecessor !== void 0) {
+          throw new Error("Invalid source vertex");
+        }
+        if (shortestPaths[destination].predecessor === void 0 && destination !== source) {
+          throw new Error("Invalid destination vertex");
+        }
+        return {
+          weight: shortestPaths[destination].distance,
+          path: runExtractPath(shortestPaths, source, destination)
+        };
+      }
+      function runExtractPath(shortestPaths, source, destination) {
+        var path = [];
+        var currentNode = destination;
+        while (currentNode !== source) {
+          path.push(currentNode);
+          currentNode = shortestPaths[currentNode].predecessor;
+        }
+        path.push(source);
+        return path.reverse();
+      }
+    }
+  });
+
   // lib/alg/tarjan.js
   var require_tarjan = __commonJS({
     "lib/alg/tarjan.js"(exports, module) {
@@ -1212,6 +1241,7 @@ var graphlib = (() => {
         components: require_components(),
         dijkstra: require_dijkstra(),
         dijkstraAll: require_dijkstra_all(),
+        extractPath: require_extract_path(),
         findCycles: require_find_cycles(),
         floydWarshall: require_floyd_warshall(),
         isAcyclic: require_is_acyclic(),
