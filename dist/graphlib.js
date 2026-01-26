@@ -686,6 +686,67 @@ var graphlib = (() => {
     }
   });
 
+  // lib/alg/bellman-ford.js
+  var require_bellman_ford = __commonJS({
+    "lib/alg/bellman-ford.js"(exports, module) {
+      module.exports = bellmanFord;
+      var DEFAULT_WEIGHT_FUNC = () => 1;
+      function bellmanFord(g, source, weightFn, edgeFn) {
+        return runBellmanFord(
+          g,
+          String(source),
+          weightFn || DEFAULT_WEIGHT_FUNC,
+          edgeFn || function(v) {
+            return g.outEdges(v);
+          }
+        );
+      }
+      function runBellmanFord(g, source, weightFn, edgeFn) {
+        var results = {}, didADistanceUpgrade = true, iterations = 0, nodes = g.nodes();
+        var relaxEdge = function(edge) {
+          var edgeWeight = weightFn(edge);
+          if (results[edge.v].distance + edgeWeight < results[edge.w].distance) {
+            results[edge.w] = {
+              distance: results[edge.v].distance + edgeWeight,
+              predecessor: edge.v
+            };
+            didADistanceUpgrade = true;
+          }
+        };
+        var relaxAllEdges = function() {
+          nodes.forEach(function(vertex) {
+            edgeFn(vertex).forEach(function(edge) {
+              var inVertex = edge.v === vertex ? edge.v : edge.w;
+              var outVertex = inVertex === edge.v ? edge.w : edge.v;
+              relaxEdge({ v: inVertex, w: outVertex });
+            });
+          });
+        };
+        nodes.forEach(function(v) {
+          var distance = v === source ? 0 : Number.POSITIVE_INFINITY;
+          results[v] = { distance };
+        });
+        var numberOfNodes = nodes.length;
+        for (var i = 1; i < numberOfNodes; i++) {
+          didADistanceUpgrade = false;
+          iterations++;
+          relaxAllEdges();
+          if (!didADistanceUpgrade) {
+            break;
+          }
+        }
+        if (iterations === numberOfNodes - 1) {
+          didADistanceUpgrade = false;
+          relaxAllEdges();
+          if (didADistanceUpgrade) {
+            throw new Error("The graph contains a negative weight cycle");
+          }
+        }
+        return results;
+      }
+    }
+  });
+
   // lib/alg/components.js
   var require_components = __commonJS({
     "lib/alg/components.js"(exports, module) {
@@ -1232,10 +1293,52 @@ var graphlib = (() => {
     }
   });
 
+  // lib/alg/shortest-paths.js
+  var require_shortest_paths = __commonJS({
+    "lib/alg/shortest-paths.js"(exports, module) {
+      var dijkstra = require_dijkstra();
+      var bellmanFord = require_bellman_ford();
+      module.exports = shortestPaths;
+      function shortestPaths(g, source, weightFn, edgeFn) {
+        return runShortestPaths(
+          g,
+          source,
+          weightFn,
+          edgeFn || function(v) {
+            return g.outEdges(v);
+          }
+        );
+      }
+      function runShortestPaths(g, source, weightFn, edgeFn) {
+        if (weightFn === void 0) {
+          return dijkstra(g, source, weightFn, edgeFn);
+        }
+        var negativeEdgeExists = false;
+        var nodes = g.nodes();
+        for (var i = 0; i < nodes.length; i++) {
+          var adjList = edgeFn(nodes[i]);
+          for (var j = 0; j < adjList.length; j++) {
+            var edge = adjList[j];
+            var inVertex = edge.v === nodes[i] ? edge.v : edge.w;
+            var outVertex = inVertex === edge.v ? edge.w : edge.v;
+            if (weightFn({ v: inVertex, w: outVertex }) < 0) {
+              negativeEdgeExists = true;
+            }
+          }
+          if (negativeEdgeExists) {
+            return bellmanFord(g, source, weightFn, edgeFn);
+          }
+        }
+        return dijkstra(g, source, weightFn, edgeFn);
+      }
+    }
+  });
+
   // lib/alg/index.js
   var require_alg = __commonJS({
     "lib/alg/index.js"(exports, module) {
       module.exports = {
+        bellmanFord: require_bellman_ford(),
         components: require_components(),
         dijkstra: require_dijkstra(),
         dijkstraAll: require_dijkstra_all(),
@@ -1246,6 +1349,7 @@ var graphlib = (() => {
         postorder: require_postorder(),
         preorder: require_preorder(),
         prim: require_prim(),
+        shortestPaths: require_shortest_paths(),
         reduce: require_reduce(),
         tarjan: require_tarjan(),
         topsort: require_topsort()
