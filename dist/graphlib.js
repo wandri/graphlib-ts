@@ -1109,58 +1109,52 @@ var graphlib = (() => {
     }
   });
 
-  // lib/alg/dfs.js
-  var require_dfs = __commonJS({
-    "lib/alg/dfs.js"(exports, module) {
-      module.exports = dfs;
-      function dfs(g, vs, order) {
+  // lib/alg/reduce.js
+  var require_reduce = __commonJS({
+    "lib/alg/reduce.js"(exports, module) {
+      module.exports = reduce;
+      function reduce(g, vs, order, fn, acc) {
         if (!Array.isArray(vs)) {
           vs = [vs];
         }
-        var navigation = g.isDirected() ? (v) => g.successors(v) : (v) => g.neighbors(v);
-        var orderFunc = order === "post" ? postOrderDfs : preOrderDfs;
-        var acc = [];
+        var navigation = (g.isDirected() ? g.successors : g.neighbors).bind(g);
         var visited = {};
-        vs.forEach((v) => {
+        vs.forEach(function(v) {
           if (!g.hasNode(v)) {
             throw new Error("Graph does not have node: " + v);
           }
-          orderFunc(v, navigation, visited, acc);
+          acc = doReduce(g, v, order === "post", visited, navigation, fn, acc);
         });
         return acc;
       }
-      function postOrderDfs(v, navigation, visited, acc) {
-        var stack = [[v, false]];
-        while (stack.length > 0) {
-          var curr = stack.pop();
-          if (curr[1]) {
-            acc.push(curr[0]);
-          } else {
-            if (!Object.hasOwn(visited, curr[0])) {
-              visited[curr[0]] = true;
-              stack.push([curr[0], true]);
-              forEachRight(navigation(curr[0]), (w) => stack.push([w, false]));
-            }
+      function doReduce(g, v, postorder, visited, navigation, fn, acc) {
+        if (!Object.hasOwn(visited, v)) {
+          visited[v] = true;
+          if (!postorder) {
+            acc = fn(acc, v);
+          }
+          navigation(v).forEach(function(w) {
+            acc = doReduce(g, w, postorder, visited, navigation, fn, acc);
+          });
+          if (postorder) {
+            acc = fn(acc, v);
           }
         }
+        return acc;
       }
-      function preOrderDfs(v, navigation, visited, acc) {
-        var stack = [v];
-        while (stack.length > 0) {
-          var curr = stack.pop();
-          if (!Object.hasOwn(visited, curr)) {
-            visited[curr] = true;
-            acc.push(curr);
-            forEachRight(navigation(curr), (w) => stack.push(w));
-          }
-        }
-      }
-      function forEachRight(array, iteratee) {
-        var length = array.length;
-        while (length--) {
-          iteratee(array[length], length, array);
-        }
-        return array;
+    }
+  });
+
+  // lib/alg/dfs.js
+  var require_dfs = __commonJS({
+    "lib/alg/dfs.js"(exports, module) {
+      var reduce = require_reduce();
+      module.exports = dfs;
+      function dfs(g, vs, order) {
+        return reduce(g, vs, order, function(acc, v) {
+          acc.push(v);
+          return acc;
+        }, []);
       }
     }
   });
@@ -1248,6 +1242,7 @@ var graphlib = (() => {
         postorder: require_postorder(),
         preorder: require_preorder(),
         prim: require_prim(),
+        reduce: require_reduce(),
         tarjan: require_tarjan(),
         topsort: require_topsort()
       };
