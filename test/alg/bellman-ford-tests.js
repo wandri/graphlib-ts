@@ -1,7 +1,6 @@
-var expect = require("../chai").expect,
-  Graph = require("../..").Graph,
-  bellmanFord = require("../..").alg.bellmanFord,
-  shortestPathsTests = require("./shortest-paths-tests.js");
+var Graph = require("../..").Graph;
+var bellmanFord = require("../..").alg.bellmanFord;
+var shortestPathsTests = require("./utils/shortest-paths-tests");
 
 describe("alg.bellmanFord", function(){
   shortestPathsTests(bellmanFord);
@@ -17,7 +16,7 @@ describe("alg.bellmanFord", function(){
     g.setEdge("d", "b", 1);
     g.setEdge("e", "d", -3);
 
-    expect(bellmanFord(g, "a", weightFn(g))).to.eql({
+    expect(bellmanFord(g, "a", weightFn(g))).toEqual({
       a: { distance: 0 },
       b: { distance: -1, predecessor: "a" },
       c: { distance: 2, predecessor: "b" },
@@ -35,7 +34,7 @@ describe("alg.bellmanFord", function(){
     g.setEdge("d", "b", 1);
     g.setEdge("c", "f", 8);
 
-    expect(function() { bellmanFord(g, "a", weightFn(g)); } ).to.throw();
+    expect(function() { bellmanFord(g, "a", weightFn(g)); } ).toThrow();
   });
 });
 
