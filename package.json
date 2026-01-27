@@ -1,6 +1,6 @@
 {
   "name": "@dagrejs/graphlib",
-  "version": "3.0.2-pre",
+  "version": "3.0.2",
   "description": "A directed and undirected multi-graph library",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
@@ -19,13 +19,13 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/dagre.d.ts",
-      "import": "./dist/dagre.esm.js",
-      "require": "./dist/dagre.cjs.js"
+      "types": "./dist/graphlib.d.ts",
+      "import": "./dist/graphlib.esm.js",
+      "require": "./dist/graphlib.cjs.js"
     },
     "./package.json": "./package.json"
   },
-  "types": "./dist/dagre.d.ts",
+  "types": "./dist/graphlib.d.ts",
   "keywords": [
     "graph",
     "algorithms"

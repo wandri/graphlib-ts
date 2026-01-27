@@ -606,7 +606,7 @@ var graphlib = (() => {
   // lib/version.js
   var require_version = __commonJS({
     "lib/version.js"(exports, module) {
-      module.exports = "3.0.1";
+      module.exports = "3.0.2";
     }
   });
 
