@@ -486,7 +486,7 @@ export namespace alg {
     graph: Graph,
     weightFn?: (e: Edge) => number,
     edgeFn?: (v: string) => Edge[],
-  ): { : { [node: string]: Path } };
+  ): { [source: string]: { [node: string]: Path } };
 
   /**
    * Given a Graph, graph, this function returns all nodes that are part of a cycle. As there
