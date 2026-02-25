@@ -93,7 +93,7 @@ function writeEdges(g: Graph): JsonEdge[] {
  * g2.edges()
  * // [ { v: 'a', w: 'b' } ]
  */
-export function read<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknown>(
+export function read<GraphLabel = any, NodeLabel = any, EdgeLabel = any>(
     json: JsonGraph
 ): Graph<GraphLabel, NodeLabel, EdgeLabel> {
     const g = new Graph<GraphLabel, NodeLabel, EdgeLabel>(json.options);

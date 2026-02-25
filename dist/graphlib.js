@@ -309,7 +309,6 @@ var graphlib = (() => {
           return parent;
         }
       }
-      return void 0;
     }
     /**
      * Gets list of direct children of node v.
@@ -329,7 +328,7 @@ var graphlib = (() => {
       } else if (this.hasNode(v)) {
         return [];
       }
-      return void 0;
+      return [];
     }
     /**
      * Return all nodes that are predecessors of the specified node or undefined if node v is not in
@@ -344,7 +343,6 @@ var graphlib = (() => {
       if (predsV) {
         return Object.keys(predsV);
       }
-      return void 0;
     }
     /**
      * Return all nodes that are successors of the specified node or undefined if node v is not in
@@ -359,7 +357,6 @@ var graphlib = (() => {
       if (sucsV) {
         return Object.keys(sucsV);
       }
-      return void 0;
     }
     /**
      * Return all nodes that are predecessors or successors of the specified node or undefined if
@@ -378,7 +375,6 @@ var graphlib = (() => {
         }
         return Array.from(union.values());
       }
-      return void 0;
     }
     isLeaf(v) {
       let neighbors;
@@ -418,9 +414,9 @@ var graphlib = (() => {
       const parents = {};
       const findParent = (v) => {
         const parent = this.parent(v);
-        if (parent === void 0 || copy.hasNode(parent)) {
-          parents[v] = parent;
-          return parent;
+        if (!parent || copy.hasNode(parent)) {
+          parents[v] = parent != null ? parent : void 0;
+          return parent != null ? parent : void 0;
         } else if (parent in parents) {
           return parents[parent];
         } else {
@@ -574,12 +570,12 @@ var graphlib = (() => {
     }
     /**
      * Return all edges that point to the node v. Optionally filters those edges down to just those
-     * coming from node u. Behavior is undefined for undirected graphs - use nodeEdges instead.
+     * coming from node u. Behavior is void for undirected graphs - use nodeEdges instead.
      * Complexity: O(|E|).
      *
      * @param v - edge sink node.
      * @param w - edge source node.
-     * @returns edges descriptors list if v is in the graph, or undefined otherwise.
+     * @returns edges descriptors list if v is in the graph, or void otherwise.
      */
     inEdges(v, w) {
       if (this.isDirected()) {
@@ -589,12 +585,12 @@ var graphlib = (() => {
     }
     /**
      * Return all edges that are pointed at by node v. Optionally filters those edges down to just
-     * those point to w. Behavior is undefined for undirected graphs - use nodeEdges instead.
+     * those point to w. Behavior is void for undirected graphs - use nodeEdges instead.
      * Complexity: O(|E|).
      *
      * @param v - edge source node.
      * @param w - edge sink node.
-     * @returns edges descriptors list if v is in the graph, or undefined otherwise.
+     * @returns edges descriptors list if v is in the graph, or void otherwise.
      */
     outEdges(v, w) {
       if (this.isDirected()) {
@@ -609,13 +605,12 @@ var graphlib = (() => {
      *
      * @param v - edge adjacent node.
      * @param w - edge adjacent node.
-     * @returns edges descriptors list if v is in the graph, or undefined otherwise.
+     * @returns edges descriptors list if v is in the graph, or void otherwise.
      */
     nodeEdges(v, w) {
       if (v in this._nodes) {
         return this.filterEdges({ ...this._in[v], ...this._out[v] }, v, w);
       }
-      return void 0;
     }
     _removeFromParentsChildList(v) {
       delete this._children[this._parent[v]][v];
@@ -799,7 +794,7 @@ var graphlib = (() => {
     };
     nodes.forEach(function(v) {
       const distance = v === source ? 0 : Number.POSITIVE_INFINITY;
-      results[v] = { distance };
+      results[v] = { distance, predecessor: "" };
     });
     const numberOfNodes = nodes.length;
     for (let i = 1; i < numberOfNodes; i++) {
@@ -1007,7 +1002,7 @@ var graphlib = (() => {
     };
     graph.nodes().forEach(function(v2) {
       const distance = v2 === source ? 0 : Number.POSITIVE_INFINITY;
-      results[v2] = { distance };
+      results[v2] = { distance, predecessor: "" };
       pq.add(v2, distance);
     });
     while (pq.size() > 0) {
@@ -1092,10 +1087,10 @@ var graphlib = (() => {
     const nodes = graph.nodes();
     nodes.forEach(function(v) {
       results[v] = {};
-      results[v][v] = { distance: 0 };
+      results[v][v] = { distance: 0, predecessor: "" };
       nodes.forEach(function(w) {
         if (v !== w) {
-          results[v][w] = { distance: Number.POSITIVE_INFINITY };
+          results[v][w] = { distance: Number.POSITIVE_INFINITY, predecessor: "" };
         }
       });
       edgeFn(v).forEach(function(edge) {

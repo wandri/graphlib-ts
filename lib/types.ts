@@ -29,7 +29,7 @@ export interface Path {
     /** The sum of weights from source to this node along the shortest path */
     distance: number;
     /** The predecessor node in the shortest path, used to walk back to the source */
-    predecessor?: string;
+    predecessor: string;
 }
 
 /** Function that takes an edge and returns its weight */

@@ -3,7 +3,7 @@ import {extractPath} from '../../lib/alg/extract-path';
 describe("alg.extractPath", () => {
     it("returns weight: 0 and path: [source], from source to source", () => {
         const shortestPaths = {
-            "a": {distance: 0},
+            "a": {distance: 0, predecessor: ''},
             "b": {distance: 73, predecessor: "a"}
         };
         expect(extractPath(shortestPaths, "a", "a")).toEqual(
@@ -15,7 +15,7 @@ describe("alg.extractPath", () => {
 
     it("returns weight and path from source to destination", () => {
         const shortestPaths = {
-            "a": {distance: 0},
+            "a": {distance: 0, predecessor: ''},
             "b": {distance: 25, predecessor: "a"},
             "c": {distance: 55, predecessor: "b"},
             "d": {distance: 44, predecessor: "b"},
@@ -32,7 +32,7 @@ describe("alg.extractPath", () => {
 
     it("throws an error when provided with an invalid source vertex", () => {
         const shortestPaths = {
-            "a": {distance: 0},
+            "a": {distance: 0, predecessor: ''},
             "b": {distance: 17, predecessor: "c"},
             "c": {distance: 42, predecessor: "a"}
         };
@@ -43,9 +43,9 @@ describe("alg.extractPath", () => {
 
     it("throws an error when given an invalid destination vertex", () => {
         const shortestPaths = {
-            "a": {distance: 0},
+            "a": {distance: 0, predecessor: ''},
             "b": {distance: 99, predecessor: "a"},
-            "c": {distance: 100}
+            "c": {distance: 100, predecessor: ''}
         };
         expect(() => {
             extractPath(shortestPaths, "a", "c");

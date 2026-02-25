@@ -38,6 +38,6 @@ export declare function write(graph: Graph): JsonGraph;
  * g2.edges()
  * // [ { v: 'a', w: 'b' } ]
  */
-export declare function read<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknown>(json: JsonGraph): Graph<GraphLabel, NodeLabel, EdgeLabel>;
+export declare function read<GraphLabel = any, NodeLabel = any, EdgeLabel = any>(json: JsonGraph): Graph<GraphLabel, NodeLabel, EdgeLabel>;
 export {};
 //# sourceMappingURL=json.d.ts.map

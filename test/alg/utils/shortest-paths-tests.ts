@@ -4,13 +4,13 @@ import * as alg from '../../../lib/alg/index';
 
 export function tests(algorithm: (g: Graph, source: string, weightFn?: WeightFunction, edgeFn?: EdgeFunction) => Record<string, {
     distance: number;
-    predecessor?: string
+    predecessor: string
 }>) {
     describe("Shortest Path Algorithms", () => {
         it("assigns distance 0 for the source node", () => {
             const g = new Graph();
             g.setNode("source");
-            expect(algorithm(g, "source")).toEqual({source: {distance: 0}});
+            expect(algorithm(g, "source")).toEqual({source: {distance: 0, predecessor: ''}});
         });
 
         it("returns Number.POSITIVE_INFINITY for unconnected nodes", () => {
@@ -18,8 +18,8 @@ export function tests(algorithm: (g: Graph, source: string, weightFn?: WeightFun
             g.setNode("a");
             g.setNode("b");
             expect(algorithm(g, "a")).toEqual({
-                a: {distance: 0},
-                b: {distance: Number.POSITIVE_INFINITY}
+                a: {distance: 0, predecessor: ''},
+                b: {distance: Number.POSITIVE_INFINITY, predecessor: ''}
             });
         });
 
@@ -28,7 +28,7 @@ export function tests(algorithm: (g: Graph, source: string, weightFn?: WeightFun
             g.setPath(["a", "b", "c"]);
             g.setEdge("b", "d");
             expect(algorithm(g, "a")).toEqual({
-                a: {distance: 0},
+                a: {distance: 0, predecessor: ''},
                 b: {distance: 1, predecessor: "a"},
                 c: {distance: 2, predecessor: "b"},
                 d: {distance: 2, predecessor: "b"}
@@ -40,7 +40,7 @@ export function tests(algorithm: (g: Graph, source: string, weightFn?: WeightFun
             g.setPath(["a", "b", "c"]);
             g.setEdge("b", "d");
             expect(algorithm(g, "a")).toEqual({
-                a: {distance: 0},
+                a: {distance: 0, predecessor: ''},
                 b: {distance: 1, predecessor: "a"},
                 c: {distance: 2, predecessor: "b"},
                 d: {distance: 2, predecessor: "b"}
@@ -56,7 +56,7 @@ export function tests(algorithm: (g: Graph, source: string, weightFn?: WeightFun
                     a: {distance: 2, predecessor: "b"},
                     b: {distance: 1, predecessor: "d"},
                     c: {distance: 2, predecessor: "b"},
-                    d: {distance: 0}
+                    d: {distance: 0, predecessor: ''}
                 });
             }
         );
@@ -69,7 +69,7 @@ export function tests(algorithm: (g: Graph, source: string, weightFn?: WeightFun
             g.setEdge("c", "d", 3);
 
             expect(algorithm(g, "a", weightFn(g))).toEqual({
-                a: {distance: 0},
+                a: {distance: 0, predecessor: ''},
                 b: {distance: 1, predecessor: "a"},
                 c: {distance: 2, predecessor: "a"},
                 d: {distance: 4, predecessor: "b"}
@@ -85,7 +85,7 @@ export function tests(algorithm: (g: Graph, source: string, weightFn?: WeightFun
                 a: {distance: 2, predecessor: "c"},
                 b: {distance: 2, predecessor: "c"},
                 c: {distance: 1, predecessor: "d"},
-                d: {distance: 0}
+                d: {distance: 0, predecessor: ''}
             });
         });
     });

@@ -14,13 +14,13 @@ const EDGE_KEY_DELIM = "\x01";
 //    edges up and, object properties, which have string keys, are the closest
 //    we're going to get to a performant hashtable in JavaScript.
 
-export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknown> {
+export class Graph<GraphLabel = any, NodeLabel = any, EdgeLabel = any> {
     private _isDirected: boolean = true;
     private _isMultigraph: boolean = false;
     private _isCompound: boolean = false;
 
     // Label for the graph itself
-    private _label: GraphLabel | undefined;
+    private _label!: GraphLabel;
     // v -> label
     private _nodes: Record<string, NodeLabel> = {};
     // v -> edgeObj
@@ -104,7 +104,8 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      *
      * @returns currently assigned label for the graph or undefined if no label assigned.
      */
-    graph(): GraphLabel | undefined {
+    graph(): GraphLabel {
+        // TODO: This should return undefined if no label was assigned, but that would be a breaking change.
         return this._label;
     }
 
@@ -228,8 +229,9 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      * @param name - node name.
      * @returns label value of the node.
      */
-    node(name: string): NodeLabel | undefined {
-        return this._nodes[name];
+    node(name: string): NodeLabel {
+        // TODO: This should return undefined if the node doesn't exist, but that would be a breaking change.
+        return this._nodes[name]!;
     }
 
     /**
@@ -258,7 +260,7 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
             if (this._isCompound) {
                 this._removeFromParentsChildList(name);
                 delete this._parent![name];
-                this.children(name)!.forEach((child) => {
+                this.children(name).forEach((child) => {
                     this.setParent(child);
                 });
                 delete this._children![name];
@@ -294,7 +296,7 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
         } else {
             // Coerce parent to string
             parent += "";
-            for (let ancestor: string | undefined = parent; ancestor !== undefined; ancestor = this.parent(ancestor)) {
+            for (let ancestor: string | undefined | void = parent; ancestor !== undefined; ancestor = this.parent(ancestor)) {
                 if (ancestor === v) {
                     throw new Error("Setting " + parent + " as parent of " + v +
                         " would create a cycle");
@@ -318,14 +320,13 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      * @param v - node to get parent of.
      * @returns parent node name or void if v has no parent.
      */
-    parent(v: string): string | undefined {
+    parent(v: string): string | void {
         if (this._isCompound) {
             const parent = this._parent![v];
             if (parent !== GRAPH_NODE) {
                 return parent;
             }
         }
-        return undefined;
     }
 
     /**
@@ -335,7 +336,7 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      * @param v - node to get children of.
      * @returns children nodes names list.
      */
-    children(v: string = GRAPH_NODE): string[] | undefined {
+    children(v: string = GRAPH_NODE): string[] {
         if (this._isCompound) {
             const children = this._children![v];
             if (children) {
@@ -346,7 +347,7 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
         } else if (this.hasNode(v)) {
             return [];
         }
-        return undefined;
+        return [];
     }
 
     /**
@@ -357,12 +358,11 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      * @param v - node identifier.
      * @returns node identifiers list or undefined if v is not in the graph.
      */
-    predecessors(v: string): string[] | undefined {
+    predecessors(v: string): void | string[] {
         const predsV = this._preds[v];
         if (predsV) {
             return Object.keys(predsV);
         }
-        return undefined;
     }
 
     /**
@@ -373,12 +373,11 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      * @param v - node identifier.
      * @returns node identifiers list or undefined if v is not in the graph.
      */
-    successors(v: string): string[] | undefined {
+    successors(v: string): void | string[] {
         const sucsV = this._sucs[v];
         if (sucsV) {
             return Object.keys(sucsV);
         }
-        return undefined;
     }
 
     /**
@@ -389,7 +388,7 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      * @param v - node identifier.
      * @returns node identifiers list or undefined if v is not in the graph.
      */
-    neighbors(v: string): string[] | undefined {
+    neighbors(v: string): void | string[] {
         const preds = this.predecessors(v);
         if (preds) {
             const union = new Set(preds);
@@ -399,11 +398,10 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
 
             return Array.from(union.values());
         }
-        return undefined;
     }
 
     isLeaf(v: string): boolean {
-        let neighbors: string[] | undefined;
+        let neighbors: string[] | void;
         if (this.isDirected()) {
             neighbors = this.successors(v);
         } else {
@@ -421,7 +419,7 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      * @param filter - filtration function detecting whether the node should stay or not.
      * @returns new graph made from current and nodes filtered.
      */
-    filterNodes(filter: (v: string) => boolean): Graph<GraphLabel, NodeLabel, EdgeLabel> {
+    filterNodes(filter: (v: string) => boolean): this {
         const copy = new (this.constructor as typeof Graph<GraphLabel, NodeLabel, EdgeLabel>)({
             directed: this._isDirected,
             multigraph: this._isMultigraph,
@@ -445,9 +443,9 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
         const parents: Record<string, string | undefined> = {};
         const findParent = (v: string): string | undefined => {
             const parent = this.parent(v);
-            if (parent === undefined || copy.hasNode(parent)) {
-                parents[v] = parent;
-                return parent;
+            if (!parent || copy.hasNode(parent)) {
+                parents[v] = parent ?? undefined;
+                return parent ?? undefined;
             } else if (parent in parents) {
                 return parents[parent];
             } else {
@@ -459,7 +457,7 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
             copy.nodes().forEach(v => copy.setParent(v, findParent(v)));
         }
 
-        return copy;
+        return copy as this;
     }
 
     /**
@@ -627,7 +625,7 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      * @param name - name of the edge (actual for multigraph).
      * @returns value associated with specified edge.
      */
-    edge(v: string, w: string, name?: string): EdgeLabel | undefined;
+    edge(v: string, w: string, name?: string): EdgeLabel;
 
     /**
      * Gets the label for the specified edge.
@@ -636,13 +634,14 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      * @param edge - edge descriptor.
      * @returns value associated with specified edge.
      */
-    edge(edge: Edge): EdgeLabel | undefined;
+    edge(edge: Edge): EdgeLabel;
 
-    edge(v: string | Edge, w?: string, name?: string): EdgeLabel | undefined {
+    edge(v: string | Edge, w?: string, name?: string): EdgeLabel {
+        // TODO: This should return undefined if the edge doesn't exist, but that would be a breaking change.
         const e = (arguments.length === 1
             ? edgeObjToId(this._isDirected, v as Edge)
             : edgeArgsToId(this._isDirected, v as string, w!, name));
-        return this._edgeLabels[e];
+        return this._edgeLabels[e]!;
     }
 
     /**
@@ -745,14 +744,14 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
 
     /**
      * Return all edges that point to the node v. Optionally filters those edges down to just those
-     * coming from node u. Behavior is undefined for undirected graphs - use nodeEdges instead.
+     * coming from node u. Behavior is void for undirected graphs - use nodeEdges instead.
      * Complexity: O(|E|).
      *
      * @param v - edge sink node.
      * @param w - edge source node.
-     * @returns edges descriptors list if v is in the graph, or undefined otherwise.
+     * @returns edges descriptors list if v is in the graph, or void otherwise.
      */
-    inEdges(v: string, w?: string): Edge[] | undefined {
+    inEdges(v: string, w?: string): void | Edge[] {
         if (this.isDirected()) {
             return this.filterEdges(this._in[v], v, w);
         }
@@ -761,14 +760,14 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
 
     /**
      * Return all edges that are pointed at by node v. Optionally filters those edges down to just
-     * those point to w. Behavior is undefined for undirected graphs - use nodeEdges instead.
+     * those point to w. Behavior is void for undirected graphs - use nodeEdges instead.
      * Complexity: O(|E|).
      *
      * @param v - edge source node.
      * @param w - edge sink node.
-     * @returns edges descriptors list if v is in the graph, or undefined otherwise.
+     * @returns edges descriptors list if v is in the graph, or void otherwise.
      */
-    outEdges(v: string, w?: string): Edge[] | undefined {
+    outEdges(v: string, w?: string): void | Edge[] {
         if (this.isDirected()) {
             return this.filterEdges(this._out[v], v, w);
         }
@@ -782,13 +781,12 @@ export class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknow
      *
      * @param v - edge adjacent node.
      * @param w - edge adjacent node.
-     * @returns edges descriptors list if v is in the graph, or undefined otherwise.
+     * @returns edges descriptors list if v is in the graph, or void otherwise.
      */
-    nodeEdges(v: string, w?: string): Edge[] | undefined {
+    nodeEdges(v: string, w?: string): void | Edge[] {
         if (v in this._nodes) {
             return this.filterEdges({...this._in[v]!, ...this._out[v]!}, v, w);
         }
-        return undefined;
     }
 
     // Defaults to be set when creating a new node

@@ -321,7 +321,7 @@ describe("Graph", () => {
             g.setParent("b", "a");
             g.removeNode("b");
             expect(g.parent("b")).toBeUndefined();
-            expect(g.children("b")).toBeUndefined();
+            expect(g.children("b")).toEqual([]);
             expect(g.children("a")).not.toContain("b");
             expect(g.parent("c")).toBeUndefined();
         });
@@ -373,14 +373,14 @@ describe("Graph", () => {
             g.setParent("a", "parent");
             g.setParent("a", undefined);
             expect(g.parent("a")).toBeUndefined();
-            expect(g.children()?.sort()).toEqual(["a", "parent"]);
+            expect(g.children().sort()).toEqual(["a", "parent"]);
         });
 
         it("removes the parent if no parent was specified", () => {
             g.setParent("a", "parent");
             g.setParent("a");
             expect(g.parent("a")).toBeUndefined();
-            expect(g.children()?.sort()).toEqual(["a", "parent"]);
+            expect(g.children().sort()).toEqual(["a", "parent"]);
         });
 
         it("is idempotent to remove a parent", () => {
@@ -388,7 +388,7 @@ describe("Graph", () => {
             g.setParent("a");
             g.setParent("a");
             expect(g.parent("a")).toBeUndefined();
-            expect(g.children()?.sort()).toEqual(["a", "parent"]);
+            expect(g.children().sort()).toEqual(["a", "parent"]);
         });
 
         it("uses the stringified form of the id", () => {
@@ -444,7 +444,7 @@ describe("Graph", () => {
         });
 
         it("returns undefined if the node is not in the graph", () => {
-            expect(g.children("a")).toBeUndefined();
+            expect(g.children("a")).toEqual([]);
         });
 
         it("defaults to en empty list for new nodes", () => {
@@ -454,7 +454,7 @@ describe("Graph", () => {
 
         it("returns undefined for a non-compound graph without the node", () => {
             const g = new Graph();
-            expect(g.children("a")).toBeUndefined();
+            expect(g.children("a")).toEqual([]);
         });
 
         it("returns an empty list for a non-compound graph with the node", () => {
@@ -467,7 +467,7 @@ describe("Graph", () => {
             const g = new Graph();
             g.setNode("a");
             g.setNode("b");
-            expect(g.children()?.sort()).toEqual(["a", "b"]);
+            expect(g.children().sort()).toEqual(["a", "b"]);
         });
 
         it("returns children for the node", () => {
@@ -482,7 +482,7 @@ describe("Graph", () => {
             g.setNode("c");
             g.setNode("parent");
             g.setParent("a", "parent");
-            expect(g.children()?.sort()).toEqual(["b", "c", "parent"]);
+            expect(g.children().sort()).toEqual(["b", "c", "parent"]);
             expect(g.children(undefined)?.sort()).toEqual(["b", "c", "parent"]);
         });
     });

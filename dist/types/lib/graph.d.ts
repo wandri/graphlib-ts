@@ -1,5 +1,5 @@
 import type { Edge, EdgeLabelFactory, GraphOptions, NodeLabelFactory } from './types';
-export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel = unknown> {
+export declare class Graph<GraphLabel = any, NodeLabel = any, EdgeLabel = any> {
     private _isDirected;
     private _isMultigraph;
     private _isCompound;
@@ -46,7 +46,7 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      *
      * @returns currently assigned label for the graph or undefined if no label assigned.
      */
-    graph(): GraphLabel | undefined;
+    graph(): GraphLabel;
     /**
      * Sets the default node label. This label will be assigned as default label
      * in case if no label was specified while setting a node.
@@ -112,7 +112,7 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      * @param name - node name.
      * @returns label value of the node.
      */
-    node(name: string): NodeLabel | undefined;
+    node(name: string): NodeLabel;
     /**
      * Detects whether graph has a node with specified name or not.
      *
@@ -148,7 +148,7 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      * @param v - node to get parent of.
      * @returns parent node name or void if v has no parent.
      */
-    parent(v: string): string | undefined;
+    parent(v: string): string | void;
     /**
      * Gets list of direct children of node v.
      * Complexity: O(1).
@@ -156,7 +156,7 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      * @param v - node to get children of.
      * @returns children nodes names list.
      */
-    children(v?: string): string[] | undefined;
+    children(v?: string): string[];
     /**
      * Return all nodes that are predecessors of the specified node or undefined if node v is not in
      * the graph. Behavior is undefined for undirected graphs - use neighbors instead.
@@ -165,7 +165,7 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      * @param v - node identifier.
      * @returns node identifiers list or undefined if v is not in the graph.
      */
-    predecessors(v: string): string[] | undefined;
+    predecessors(v: string): void | string[];
     /**
      * Return all nodes that are successors of the specified node or undefined if node v is not in
      * the graph. Behavior is undefined for undirected graphs - use neighbors instead.
@@ -174,7 +174,7 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      * @param v - node identifier.
      * @returns node identifiers list or undefined if v is not in the graph.
      */
-    successors(v: string): string[] | undefined;
+    successors(v: string): void | string[];
     /**
      * Return all nodes that are predecessors or successors of the specified node or undefined if
      * node v is not in the graph.
@@ -183,7 +183,7 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      * @param v - node identifier.
      * @returns node identifiers list or undefined if v is not in the graph.
      */
-    neighbors(v: string): string[] | undefined;
+    neighbors(v: string): void | string[];
     isLeaf(v: string): boolean;
     /**
      * Creates new graph with nodes filtered via filter. Edges incident to rejected node
@@ -194,7 +194,7 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      * @param filter - filtration function detecting whether the node should stay or not.
      * @returns new graph made from current and nodes filtered.
      */
-    filterNodes(filter: (v: string) => boolean): Graph<GraphLabel, NodeLabel, EdgeLabel>;
+    filterNodes(filter: (v: string) => boolean): this;
     /**
      * Sets the default edge label. This label will be assigned as default label
      * in case if no label was specified while setting an edge.
@@ -264,7 +264,7 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      * @param name - name of the edge (actual for multigraph).
      * @returns value associated with specified edge.
      */
-    edge(v: string, w: string, name?: string): EdgeLabel | undefined;
+    edge(v: string, w: string, name?: string): EdgeLabel;
     /**
      * Gets the label for the specified edge.
      * Complexity: O(1).
@@ -272,7 +272,7 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      * @param edge - edge descriptor.
      * @returns value associated with specified edge.
      */
-    edge(edge: Edge): EdgeLabel | undefined;
+    edge(edge: Edge): EdgeLabel;
     /**
      * Gets the label for the specified edge and converts it to an object.
      * Complexity: O(1).
@@ -333,24 +333,24 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
     removeEdge(edge: Edge): this;
     /**
      * Return all edges that point to the node v. Optionally filters those edges down to just those
-     * coming from node u. Behavior is undefined for undirected graphs - use nodeEdges instead.
+     * coming from node u. Behavior is void for undirected graphs - use nodeEdges instead.
      * Complexity: O(|E|).
      *
      * @param v - edge sink node.
      * @param w - edge source node.
-     * @returns edges descriptors list if v is in the graph, or undefined otherwise.
+     * @returns edges descriptors list if v is in the graph, or void otherwise.
      */
-    inEdges(v: string, w?: string): Edge[] | undefined;
+    inEdges(v: string, w?: string): void | Edge[];
     /**
      * Return all edges that are pointed at by node v. Optionally filters those edges down to just
-     * those point to w. Behavior is undefined for undirected graphs - use nodeEdges instead.
+     * those point to w. Behavior is void for undirected graphs - use nodeEdges instead.
      * Complexity: O(|E|).
      *
      * @param v - edge source node.
      * @param w - edge sink node.
-     * @returns edges descriptors list if v is in the graph, or undefined otherwise.
+     * @returns edges descriptors list if v is in the graph, or void otherwise.
      */
-    outEdges(v: string, w?: string): Edge[] | undefined;
+    outEdges(v: string, w?: string): void | Edge[];
     /**
      * Returns all edges to or from node v regardless of direction. Optionally filters those edges
      * down to just those between nodes v and w regardless of direction.
@@ -358,9 +358,9 @@ export declare class Graph<GraphLabel = unknown, NodeLabel = unknown, EdgeLabel 
      *
      * @param v - edge adjacent node.
      * @param w - edge adjacent node.
-     * @returns edges descriptors list if v is in the graph, or undefined otherwise.
+     * @returns edges descriptors list if v is in the graph, or void otherwise.
      */
-    nodeEdges(v: string, w?: string): Edge[] | undefined;
+    nodeEdges(v: string, w?: string): void | Edge[];
     private _defaultNodeLabelFn;
     private _defaultEdgeLabelFn;
     private _removeFromParentsChildList;

@@ -15,28 +15,28 @@ describe("alg.floydWarshall", () => {
 
         expect(floydWarshall(g, weightFn(g))).toEqual({
             a: {
-                a: {distance: 0},
+                a: {distance: 0, predecessor: ''},
                 b: {distance: 1, predecessor: "a"},
                 c: {distance: -2, predecessor: "a"},
                 d: {distance: 1, predecessor: "c"}
             },
             b: {
-                a: {distance: Number.POSITIVE_INFINITY},
-                b: {distance: 0},
-                c: {distance: Number.POSITIVE_INFINITY},
+                a: {distance: Number.POSITIVE_INFINITY, predecessor: ''},
+                b: {distance: 0, predecessor: ''},
+                c: {distance: Number.POSITIVE_INFINITY, predecessor: ''},
                 d: {distance: 3, predecessor: "b"}
             },
             c: {
-                a: {distance: Number.POSITIVE_INFINITY},
-                b: {distance: Number.POSITIVE_INFINITY},
-                c: {distance: 0},
+                a: {distance: Number.POSITIVE_INFINITY, predecessor: ''},
+                b: {distance: Number.POSITIVE_INFINITY, predecessor: ''},
+                c: {distance: 0, predecessor: ''},
                 d: {distance: 3, predecessor: "c"}
             },
             d: {
-                a: {distance: Number.POSITIVE_INFINITY},
-                b: {distance: Number.POSITIVE_INFINITY},
-                c: {distance: Number.POSITIVE_INFINITY},
-                d: {distance: 0}
+                a: {distance: Number.POSITIVE_INFINITY, predecessor: ''},
+                b: {distance: Number.POSITIVE_INFINITY, predecessor: ''},
+                c: {distance: Number.POSITIVE_INFINITY, predecessor: ''},
+                d: {distance: 0, predecessor: ''}
             }
         });
     });

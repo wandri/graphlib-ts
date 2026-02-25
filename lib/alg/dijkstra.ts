@@ -67,7 +67,7 @@ function runDijkstra(
 
     graph.nodes().forEach(function (v) {
         const distance = v === source ? 0 : Number.POSITIVE_INFINITY;
-        results[v] = {distance: distance};
+        results[v] = {distance: distance, predecessor: ''};
         pq.add(v, distance);
     });
 

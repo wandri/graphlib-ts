@@ -10,10 +10,10 @@ export function extractPath(
     source: string,
     destination: string
 ): ExtractedPath {
-    if (shortestPaths[source]!.predecessor !== undefined) {
+    if (shortestPaths[source]?.predecessor !== '') {
         throw new Error("Invalid source vertex");
     }
-    if (shortestPaths[destination]!.predecessor === undefined && destination !== source) {
+    if (shortestPaths[destination]?.predecessor === '' && destination !== source) {
         throw new Error("Invalid destination vertex");
     }
 

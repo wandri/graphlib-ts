@@ -44,10 +44,10 @@ function runFloydWarshall(
 
     nodes.forEach(function (v) {
         results[v] = {};
-        results[v]![v] = {distance: 0};
+        results[v]![v] = {distance: 0, predecessor: ''};
         nodes.forEach(function (w) {
             if (v !== w) {
-                results[v]![w] = {distance: Number.POSITIVE_INFINITY};
+                results[v]![w] = {distance: Number.POSITIVE_INFINITY, predecessor: ''};
             }
         });
         edgeFn(v).forEach(function (edge) {

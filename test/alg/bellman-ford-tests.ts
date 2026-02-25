@@ -18,7 +18,7 @@ describe("alg.bellmanFord", () => {
         g.setEdge("e", "d", -3);
 
         expect(bellmanFord(g, "a", weightFn(g))).toEqual({
-            a: {distance: 0},
+            a: {distance: 0, predecessor: ''},
             b: {distance: -1, predecessor: "a"},
             c: {distance: 2, predecessor: "b"},
             d: {distance: -2, predecessor: "e"},
